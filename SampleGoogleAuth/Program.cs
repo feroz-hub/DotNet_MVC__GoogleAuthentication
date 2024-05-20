@@ -12,7 +12,30 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.Configure<IdentityOptions>(option =>
+{
+    option.Password.RequireDigit = true;
+    option.Password.RequiredLength = 8;
+    option.Password.RequireLowercase = true;
+    option.Password.RequireNonAlphanumeric = true;
+    option.Password.RequireUppercase = true;
+    option.Lockout.AllowedForNewUsers = true;
+    option.Lockout.MaxFailedAccessAttempts = 5;
+    option.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+
+    option.User.RequireUniqueEmail = false;
+});
+
+builder.Services.ConfigureApplicationCookie(option =>
+{
+    option.Cookie.HttpOnly = true;
+    option.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+    option.LoginPath = "Identity/Account/Login";
+    option.LogoutPath = "Identity/Account/Logout";
+    option.SlidingExpiration = true;
+});
 builder.Services.AddControllersWithViews();
+
 
 var app = builder.Build();
 
@@ -32,7 +55,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
