@@ -12,6 +12,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddControllersWithViews();
 builder.Services.Configure<IdentityOptions>(option =>
 {
     option.Password.RequireDigit = true;
@@ -30,12 +31,16 @@ builder.Services.ConfigureApplicationCookie(option =>
 {
     option.Cookie.HttpOnly = true;
     option.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-    option.LoginPath = "Identity/Account/Login";
-    option.LogoutPath = "Identity/Account/Logout";
+    option.LoginPath = "/Identity/Account/Login";
+    option.LogoutPath = "/Identity/Account/Logout";
     option.SlidingExpiration = true;
 });
-builder.Services.AddControllersWithViews();
 
+builder.Services.AddAuthentication().AddGoogle(option =>
+{
+    option.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+    option.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+});
 
 var app = builder.Build();
 
